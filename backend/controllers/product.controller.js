@@ -81,7 +81,7 @@ export const deleteProduct = async(req, res) => {
   }
 }
 
-export const getRecommendedProducts = async(req, req) => {
+export const getRecommendedProducts = async(req, res) => {
   try {
     const products = await Product.aggregate([
       {

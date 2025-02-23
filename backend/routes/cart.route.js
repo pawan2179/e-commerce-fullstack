@@ -7,3 +7,5 @@ router.get('/', protectRoute, getCartProducts);
 router.post('/', protectRoute, addToCard);
 router.delete('/', removeAllFromCart);
 router.put('/:id', protectRoute, updateQuantity);
+
+export default router;

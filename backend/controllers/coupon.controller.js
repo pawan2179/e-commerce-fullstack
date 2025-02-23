@@ -1,27 +1,27 @@
 import Coupon from "../models/coupons.model.js"
 
-export const getCoupon = async(req, res) => {
+export const getCoupon = async (req, res) => {
   try {
-    const coupon = await Coupon.findOne({userId: req.user._id, isActive: true});
+    const coupon = await Coupon.findOne({ userId: req.user._id, isActive: true });
     res.json(coupon || null);
   } catch (error) {
     console.log("error in getCoupon controller : ", error.message);
-    res.status(500).json({message: "Something went wrong"});
+    res.status(500).json({ message: "Something went wrong" });
   }
 }
 
-export const validateCoupon = async(req, res) => {
+export const validateCoupon = async (req, res) => {
   try {
-    const {code} = req.body;
-    const coupon = await Coupon.findOne({code:code, userId:req.user._id, isActive:true});
+    const { code } = req.body;
+    const coupon = await Coupon.findOne({ code: code, userId: req.user._id, isActive: true });
 
-    if(!coupon) {
-      return res.json({message: "Coupon not found"}.status(404));
+    if (!coupon) {
+      return res.json({ message: "Coupon not found" }.status(404));
     }
-    if(coupon.expirationDate < new Date()) {
+    if (coupon.expirationDate < new Date()) {
       coupon.isActive = false;
       await coupon.save();
-      return res.status(403).json({message: "Coupon expired"});
+      return res.status(403).json({ message: "Coupon expired" });
     }
 
     res.json({
@@ -31,6 +31,6 @@ export const validateCoupon = async(req, res) => {
     })
   } catch (error) {
     console.log("error in validate coupon : ", error.message);
-    res.status(500).json({message: "Something went wrong"});
+    res.status(500).json({ message: "Something went wrong" });
   }
 }
