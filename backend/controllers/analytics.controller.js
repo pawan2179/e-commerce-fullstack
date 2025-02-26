@@ -6,9 +6,63 @@ export const getAnalyticsData = async(req, res) => {
   try {
     const analysisData = await analyticsData();
     const endDate = new Date()
-    const startDate = new Date(endDate.getTime() -  7*24*60*60);
+    const startDate = new Date(endDate.getTime() -  7*24*60*60*1000);
+
+    const dailySalesData = await getDailySalesData(startDate, endDate);
+    res.json({
+      analysisData,
+      dailySalesData
+    });
   } catch (error) {
-    
+    console.log('Error in getting analysis data : ', error.message);
+    res.status(500).json({message: "Somerthing wentwonf"})
+  }
+}
+
+const getDailySalesData = async(startDate, endDate) => {
+  try {
+    const dailySalesData = await Order.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: startDate,
+            $lte: endDate,
+          }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: {format: "%Y-%m-%d", date: "$createdAt"}},
+          sales: { $sum: 1},
+          revenue: { $sum: "$totalAmount"}
+        },
+      },
+      { $sort: { _id: 1}}
+    ]);
+  
+    const dateArray = getDateInRange(startDate, endDate);
+  
+    return dateArray.map(date => {
+      const foundData = dailySalesData.find(item => item._id === date);
+  
+      return {
+        date,
+        sales: foundData?.sales || 0,
+        revenue: foundData?.revenue || 0
+      }
+    })
+  } catch (error) {
+    console.log("error in generating daily sales data : ", error.message);
+    res.status(500).json({message: "Something went wrong"});
+  }
+}
+
+const getDateInRange = (startDate, endDate) => {
+  const dates = [];
+  let currentDate = new Date(startDate);
+  while(currentDate <= endDate) {
+    dates.push(currentDate.toISOString().split("T")[0]);
+    currentDate.setDate(currentDate.getDate() + 1);
   }
 }
 
