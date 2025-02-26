@@ -129,3 +129,12 @@ export const refreshAuthTokens = async (req, res) => {
     res.status(500).json({message: "Something went wrong."});
   }
 }
+
+export const getProfile = (req, res) => {
+  try {
+    res.json(req.user);
+  } catch (error) {
+    console.log("Something went wrong in getting profile : ", error.message);
+    res.status(500).json({message: "Something went wrong"});
+  }
+}
