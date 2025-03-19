@@ -1,12 +1,23 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
 import SignupPage from './pages/SignupPage'
 import LoginPage from './pages/LoginPage'
 import HomePage from './pages/HomePage'
+import AdminPage from './pages/AdminPage'
 import Navbar from './components/Navbar'
+import { Toaster } from 'react-hot-toast'
+import useUserStore from './stores/useUserStore'
+import { useEffect } from 'react'
+import LoadingSpinner from './components/LoadingSpinner'
 
 function App() {
+  const {user, checkAuth, checkingAuth} = useUserStore();
 
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  if(checkingAuth) return <LoadingSpinner />;
   return (
     <>
       <div className='min-h-screen bg-gray-900 text-white overflow-hidden'>
@@ -22,10 +33,12 @@ function App() {
           <Navbar />
           <Routes>
             <Route path='/' element={<HomePage />} />
-            <Route path='/signup' element={<SignupPage />} />
-            <Route path='/login' element={<LoginPage />} />
+            <Route path='/signup' element={user ? <Navigate to={'/'}/> : <SignupPage />} />
+            <Route path='/login' element={user ? <Navigate to={'/'}/> : <LoginPage />} />
+            <Route path='/secret-dashboard' element={true ? <AdminPage /> : <Navigate to={'/'}/>} /> //TODO:: add admin check
           </Routes>
         </div>
+        <Toaster />
       </div>
     </>
   )

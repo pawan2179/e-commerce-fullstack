@@ -22,12 +22,14 @@ export const protectRoute = async(req, res, next) => {
       throw error;
     }
   } catch (error) {
-    console.log("Error in protectRoute middleware", error.message);
+    // console.log("Error in protectRoute middleware", error.message);
     return res.status(500).json({message: "Something went wrong : ", error: error.message});
   }
 }
 
-export const adminRoute = (req, res, next) => {
-  if(req.user && req.user.role === "admin") next();
-  return res.status(403).json({message: "Access denied: only admin allowed"});
+export const adminRoute = async(req, res, next) => {
+  const user = await User.findOne({_id: req.user._id});
+  // console.log("in admin middleware : ", user);
+  if(user && user.role === "admin") next();
+  else return res.status(403).json({message: "Access denied: only admin allowed"});
 }
