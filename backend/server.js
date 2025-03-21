@@ -26,9 +26,9 @@ app.use("/api/coupons", couponRoutes);
 app.use("/api/payments", paymentsRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Healthcheck");
-})
+// app.get("/", (req, res) => {
+//   res.send("Healthcheck");
+// })
 
 if(process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/frontend/dist")));
