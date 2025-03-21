@@ -1,16 +1,20 @@
 import React, { useState } from 'react'
-import { LogIn, Mail, Lock, ArrowRight, Loader } from 'lucide-react';
+import { LogIn, Mail, Lock, ArrowRight, Loader, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import useUserStore from '../stores/useUserStore';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(true);
+  const {login, loading, user} = useUserStore();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(email, password);
+    login(formData);
+    // console.log(formData.email, formData.password);
   }
 
   return (
@@ -45,8 +49,8 @@ const LoginPage = () => {
                   type="email"
                   id='email'
                   required
-                  value={email}
-                  onChange={(e) => setFormData(e.target.value)}
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
                   className='block w-full px-3 py-2 pl-10 bg-gray-700 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-white' placeholder='Enter your email address'
                 />
               </div>
@@ -64,8 +68,8 @@ const LoginPage = () => {
                   type="password"
                   id='password'
                   required
-                  value={password}
-                  onChange={(e) => setFormData(e.target.value)}
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
                   className='block w-full px-3 py-2 pl-10 bg-gray-700 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-white' placeholder='......'
                 />
               </div>

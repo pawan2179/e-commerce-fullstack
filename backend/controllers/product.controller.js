@@ -35,11 +35,15 @@ export const getFeaturedProducts = async(req, res) => {
 
 export const createProduct = async(req, res) => {
   try {
-    const [name, description, price, image, category] = req.body;
+    console.log("In create product");
+    const {name, description, price, image, category} = req.body;
     let cloudinaryResponse = null;
+    console.log(req.body);
     if(image) {
       cloudinaryResponse = await cloudinary.uploader.upload(image, {folder:"products"})
     }
+
+    console.log(cloudinaryResponse);
 
     const product = await Product.create({
       name,
@@ -48,11 +52,13 @@ export const createProduct = async(req, res) => {
       image:cloudinaryResponse?.secure_url ? cloudinaryResponse.secure_url : "",
       category
     });
+
+    console.log(product);
     
-    res.status(201).json(product);
+    return res.status(201).json(product);
   } catch(error) {
     console.log("Failed to create product : ", error.message);
-    res.status(500).json({message: "Something went wrong"});
+    return res.status(500).json({message: "Something went wrong"});
   }
 }
 

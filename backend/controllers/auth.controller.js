@@ -63,7 +63,10 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const {email, password} = req.body;
+    // console.log(email, "  ,  ", password);
     const user = await User.findOne({email});
+
+    // console.log("User : ", user);
 
     if(user && (await user.comparePassword(password))) {
       const {accessToken, refreshToken} = generateTokens(user._id);
