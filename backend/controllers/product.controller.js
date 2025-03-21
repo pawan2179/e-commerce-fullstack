@@ -25,8 +25,10 @@ export const getFeaturedProducts = async(req, res) => {
       return res.status(404).json({message: "No featured products"});
     }
 
+    console.log("Featured: ", featuredProducts);
+
     await redis.set("featured_products", JSON.stringify(featuredProducts));
-    res.json(featuredProducts).status(200);
+    return res.json(featuredProducts || []).status(200);
   } catch (error) {
     console.log("failed to get featured products");
     res.status(500).json({message: "Server error while fetching products"});

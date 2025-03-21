@@ -32,11 +32,11 @@ export const useProductStore = create((set) => ({
       toast.error(error.response.data.error || "An error occured");
     }
   },
-  toggleFeaturedProduct: async({id}) => {
+  toggleFeaturedProduct: async(id) => {
     console.log("in toggle featured");
     set({loading:true});
     try {
-      const resp = await axios.patch(`/product/${id}`);
+      const resp = await axios.patch(`/products/${id}`);
       set((prevProducts) => ({
         products: prevProducts.products.map((product) =>
           product._id === id ? {...product, isFeatured: resp.data.isFeatured} : product),
@@ -71,6 +71,17 @@ export const useProductStore = create((set) => ({
       set({loading: false, recommendedProducts: []});
       // console.log(error);
       toast.error("An error occured in fetching recommendations");
+    }
+  },
+  fetchFeaturedProducts: async() => {
+    set({loading:true});
+    try {
+      const res = await axios.get('/products/featured');
+      console.log("Featured : ", res);
+      set({products: res.data, loading: false});
+    } catch (error) {
+      set({error: "Failed to fetch featured products.", loading: false});
+      console.log("Failed to fetch featured products");
     }
   }
 }))

@@ -52,7 +52,49 @@ const useUserStore = create((set, get) => ({
       set({loading: false});
       toast.error(error.response?.data?.message || "An error occured during logout");
     }
+  },
+  refreshToken: async() => {
+    if(get().checkAuth) return ;
+    set({checkingAuth: true});
+    try {
+      const res = await axios.post('/auth/refresh-token');
+      set({checkingAuth: false});
+      return res.data;
+    } catch (error) {
+      set({user:null, checkingAuth: false});
+      throw error;
+    }
   }
 }))
+
+//adding axios interceptors to create access tokens when they expire
+let refreshPromise = null;
+axios.interceptors.response.use(
+  (response) => response,
+  async(error) => {
+    const originalRequest = error.config;
+    if(error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        if(refreshPromise) {
+          await refreshPromise;
+          return axios(originalRequest);
+        }
+
+        //create new token
+        refreshPromise = useUserStore.getState().refreshToken();
+        await refreshPromise;
+        refreshPromise = null;
+
+        return axios(originalRequest);
+      } catch (refreshError) {
+        useUserStore.getState().logout();
+        return Promise.reject(refreshError);
+      }
+    }
+    return Promise.reject(error);
+  }
+)
 
 export default useUserStore;

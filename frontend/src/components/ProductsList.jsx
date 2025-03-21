@@ -4,7 +4,8 @@ import {Trash, Star} from 'lucide-react'
 import { useProductStore } from '../stores/useProductStore'
 
 const ProductsList = () => {
-  const {deleteProduct, toggleFeatureProduct, products } = useProductStore();
+  const {deleteProduct, toggleFeaturedProduct, products } = useProductStore();
+  console.log("Products : ", products);
   return (
     <motion.div
       initial={{opacity: 0, y: 20}}
@@ -52,8 +53,8 @@ const ProductsList = () => {
               </td>
               <td className='px-6 py-4 whitespace-nowrap'>
                 <button
-                  onClick={() => toggleFeatureProduct(product._id)}
-                  className={`p-1 rounded-full ${product.isFeatured ? "bg-yellow-500 text-gray-900" : "text-gray-600 text-gray-300"} hover:bg-yellow-500 transition-colors duration-200`}
+                  onClick={() => toggleFeaturedProduct(product._id)}
+                  className={`p-1 rounded-full ${product.isFeatured ? "bg-yellow-500 text-gray-900" : "bg-gray-600 text-gray-300"} hover:bg-yellow-500 transition-colors duration-200`}
                 >
                   <Star className='h-5 w-5' />
                 </button>
