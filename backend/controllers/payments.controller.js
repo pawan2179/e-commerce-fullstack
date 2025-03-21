@@ -45,7 +45,7 @@ export const createCheckoutSession = async(req, res) => {
       cancel_url:`${process.env.CLIENT_URL}/purchase-cancel`,
       discounts: coupon
         ? [
-          { coupon: await createStripeCoupon(coupon.discountPercentage) }
+          { coupon: await createStripeCoupon(coupon.discountPercent) }
         ]
         : [],
       metadata: {
@@ -74,12 +74,12 @@ export const createCheckoutSession = async(req, res) => {
   }
 }
 
-const createStripeCoupon = async(req, res) => {
+const createStripeCoupon = async(discount) => {
   const coupon = await stripe.coupons.create({
-    percent_off: coupon.discountPercentage,
+    percent_off: discount,
     duration:"once"
   });
-  return coupon;
+  return coupon.id;
 }
 
 const createNewCoupon = async(userId) => {
