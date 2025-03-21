@@ -3,6 +3,7 @@ import User from "../models/user.model.js";
 
 export const protectRoute = async(req, res, next) => {
   try {
+    console.log("in protect route");
     const accessToken = req.cookies.accessToken;
     if(!accessToken) {
       return res.status(401).json({message: "No token provided"});
@@ -29,7 +30,7 @@ export const protectRoute = async(req, res, next) => {
 
 export const adminRoute = async(req, res, next) => {
   const user = await User.findOne({_id: req.user._id});
-  // console.log("in admin middleware : ", user);
+  console.log("in admin middleware : ", user);
   if(user && user.role === "admin") next();
   else return res.status(403).json({message: "Access denied: only admin allowed"});
 }

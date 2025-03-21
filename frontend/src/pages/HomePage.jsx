@@ -2,12 +2,12 @@ import React from 'react'
 import CategoryItem from '../components/CategoryItem';
 
 const categories = [
-  {href: "/jeans", name: "Jeans", imageUrl: "/jeans.jpg"},
-  {href: "/tshirts", name: "T-Shirts", imageUrl: "/tshirts.jpg"},
-  {href: "/shoes", name: "Shoes", imageUrl: "/shoes.jpg"},
+  {href: "/jean", name: "Jeans", imageUrl: "/jeans.jpg"},
+  {href: "/t-shirt", name: "T-Shirts", imageUrl: "/tshirts.jpg"},
+  {href: "/shoe", name: "Shoes", imageUrl: "/shoes.jpg"},
   {href: "/glasses", name: "Glasses", imageUrl: "/glasses.png"},
-  {href: "/jackets", name: "Jackets", imageUrl: "/jackets.jpg"},
-  {href: "/bags", name: "Bags", imageUrl: "/bags.jpg"}
+  {href: "/jacket", name: "Jackets", imageUrl: "/jackets.jpg"},
+  {href: "/bag", name: "Bags", imageUrl: "/bags.jpg"}
 ];
 
 const HomePage = () => {

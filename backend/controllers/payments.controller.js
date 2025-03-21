@@ -17,16 +17,17 @@ export const createCheckoutSession = async(req, res) => {
 
       return {
         price_data: {
-          currency:"usd",
+          currency:"inr",
           product_data: {
             name: product.name,
-            image: [product.image],
+            images: [product.image],
           },
           unit_amount:amount
-        }
+        },
+        quantity: product.quantity || 1
       }
     });
-
+    // console.log("Starting to Create coupon", couponCode);
     let coupon = null;
     if(couponCode) {
       coupon = await Coupon.findOne({code:couponCode,userId:req.user._id,isActive:true});
@@ -34,12 +35,13 @@ export const createCheckoutSession = async(req, res) => {
         totalAmount -= Math.round(totalAmount * coupon.discountPercentage / 100);
       }
     }
+    // console.log("coupon created", coupon);
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types:["card"],
       line_items:lineItems,
       mode:"payment",
-      success_url:`${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION{ID}`,
+      success_url:`${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:`${process.env.CLIENT_URL}/purchase-cancel`,
       discounts: coupon
         ? [
@@ -59,9 +61,12 @@ export const createCheckoutSession = async(req, res) => {
       }
     });
 
+    // console.log("Session created : ", session);
+
     if(totalAmount >= 20000) {
       await createNewCoupon(req.user._id);
     }
+    // console.log("new coupon created and saved");
     res.status(200).json({id: session.id, totalAmount: totalAmount/100});
   } catch (error) {
     console.log("Something went wrong in creating session : ", error.message);
@@ -71,15 +76,17 @@ export const createCheckoutSession = async(req, res) => {
 
 const createStripeCoupon = async(req, res) => {
   const coupon = await stripe.coupons.create({
-    percent_off: discountPercentage,
+    percent_off: coupon.discountPercentage,
     duration:"once"
   });
+  return coupon;
 }
 
 const createNewCoupon = async(userId) => {
+  await Coupon.findOneAndDelete({userId: userId});
   const newCoupon = new Coupon({
     code: "GIFT" + Math.random().toString(36).substring(2, 8).toUpperCase(),
-    discountPercentage:10,
+    discountPercent:10,
     expirationDate: new Date(Date.now() + 30*24*60*60*1000),
     userId: userId
   })
@@ -108,7 +115,8 @@ export const checkoutSession = async(req, res) => {
       user: session.metadata.userId,
       products: products.map(product => ({
         product: product.id,
-        price: product.price
+        price: product.price,
+        quantity: product.quantity
       })),
       totalAmount: session.amount_total / 100, //convert to dollar s
       stripeSessionId: sessionId

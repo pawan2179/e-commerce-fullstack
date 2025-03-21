@@ -5,6 +5,7 @@ import axios from '../lib/axios';
 export const useProductStore = create((set) => ({
   products: [],
   loading: false,
+  recommendedProducts: [],
 
   setProducts: (products) => set({products}),
   createProduct: async (productData) => {
@@ -44,6 +45,32 @@ export const useProductStore = create((set) => ({
     } catch (error) {
       set({loading: false});
       toast.error(error.response.data.message || "An error occured");
+    }
+  },
+  fetchProductsByCategory: async(category) => {
+    set({loading: true});
+    try {
+      const res = await axios.get(`/products/category/${category}`);
+      set({
+        products: res.data.products,
+        loading:false}
+      )
+    } catch (error) {
+      
+    }
+  },
+  getRecommendedProducts: async() => {
+    set({loading: true});
+    try {
+      // console.log("In get recommended products");
+      const res = await axios.get('/products/recommendations');
+      // console.log("response -> ", res);
+      set({recommendedProducts: res.data, loading: false});
+      // console.log("recommendedproducts =>",get().recommendedProducts);
+    } catch (error) {
+      set({loading: false, recommendedProducts: []});
+      // console.log(error);
+      toast.error("An error occured in fetching recommendations");
     }
   }
 }))

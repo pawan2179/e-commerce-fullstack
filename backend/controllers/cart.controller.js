@@ -1,11 +1,12 @@
 import Product from "../models/product.model.js";
+import User from "../models/user.model.js";
 
 export const addToCard = async(req, res) => {
   try {
     const {productId} = req.body;
-    const user = req.user;
-
-    const existingItem = user.cartItems.find(item => item.id === productId);
+    const user = await User.findOne({_id: req.user._id});
+    console.log("in add cart -- > user : ", user);
+    const existingItem = user.cartItems.find(item => item._id === productId);
     if(existingItem) {
       existingItem.quantity += 1;
     }
@@ -24,12 +25,13 @@ export const addToCard = async(req, res) => {
 export const removeAllFromCart = async(req, res) => {
   try {
     const {productId} = req.body;
-    const user = req.user;
+    const user = await User.findOne({_id: req.user._id}).exec();
 
+    console.log("remove from cart --> ", user);
     if(!productId) {
       user.cartItems = [];
     }else {
-      user.cartItems = user.cartItems.filter((item) => item.id !== productId);
+      user.cartItems = user.cartItems.filter((item) => item._id != productId);
     }
 
     await user.save();
@@ -43,13 +45,15 @@ export const removeAllFromCart = async(req, res) => {
 export const updateQuantity = async(req, res) => {
   try {
     const {id:productId} = req.params;
+    console.log("Item to delete : ", productId);
     const {quantity} = req.body;
-    const user = req.user;
-    const existingItem = user.cartItems.find((item) => item.id === productId);
+    const user = await User.findOne({_id: req.user._id}).exec();
+    console.log(user);
+    const existingItem = user.cartItems.find((item) => item._id == productId);
 
     if(existingItem) {
       if(quantity === 0) {
-        user.cartItems = user.cartItems.filter((item) => item.id !== productId);
+        user.cartItems = user.cartItems.filter((item) => item._id != productId);
         await user.save();
         res.json(user.cartItems);
       }
@@ -68,10 +72,12 @@ export const updateQuantity = async(req, res) => {
 
 export const getCartProducts = async(req, res) => {
   try {
-    const products = await Product.find({_id:{$in:req.user.cartItems}});
+    const user = await User.findOne({_id: req.user._id});
+    console.log(user);
+    const products = await Product.find({_id:{$in:user.cartItems}});
 
     const cartItems = products.map((product) => {
-      const item = req.user.cartItems.find((item) => item.id === product.id);
+      const item = user.cartItems.find((item) => item.id === product.id);
       return {...product.toJSON(), quantity: item.quantity}
     });
 

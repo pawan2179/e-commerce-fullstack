@@ -102,7 +102,8 @@ export const getRecommendedProducts = async(req, res) => {
           price:1
         }
       }
-    ])
+    ]);
+    return res.status(200).json(products);
   } catch (error) {
     console.log("Error in get recommendation controller ", error.message);
     res.status(500).json({message: "Something went wrong"});
@@ -122,12 +123,14 @@ export const getProductByCategory = async(req, res) => {
 
 export const toggleFeaturedProduct = async(req, res) => {
   try {
-    let product = Product.findById(req.params.id);
+    console.log("in toggle backend");
+    let product = await Product.findById(req.params.id).exec();
+    console.log(product);
     if(product) {
       product.isFeatured = !product.isFeatured;
-      const updatedProduct = await product.save();
+      await product.save();
       await updateFeaturedProductCache();
-      res.json(updatedProduct);
+      res.json(product);
     }
   } catch (error) {
     console.log("Error in toggle feature controller: ", error.message);
